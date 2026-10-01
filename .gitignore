@@ -1,0 +1,9 @@
+# Gradle and Android build state
+.gradle/
+build/
+local.properties
+
+# Editor and operating-system state
+.idea/
+*.iml
+.DS_Store

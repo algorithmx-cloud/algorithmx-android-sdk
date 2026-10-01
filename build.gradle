@@ -1,0 +1,120 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'maven-publish'
+    id 'signing'
+}
+
+// Maven Central coordinates: com.algorithmx:android-sdk:<version>
+group = 'com.algorithmx'
+version = '1.0.0'
+
+android {
+    namespace 'algorithmx.engage'
+    compileSdk 34
+
+    defaultConfig {
+        minSdk 24
+        targetSdk 34
+        consumerProguardFiles 'consumer-rules.pro'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+    packaging {
+        resources {
+            excludes += ['/META-INF/{AL2.0,LGPL2.1}']
+        }
+    }
+
+    // Maven Central requires sources and javadoc jars next to the AAR.
+    publishing {
+        singleVariant('release') {
+            withSourcesJar()
+            withJavadocJar()
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.core:core-ktx:1.13.1'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+
+    // Networking
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+
+    // JSON
+    implementation 'com.google.code.gson:gson:2.11.0'
+
+    // Coroutines
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1'
+
+    // SQLite
+    implementation 'androidx.sqlite:sqlite-ktx:2.4.0'
+
+    // Firebase removed: no cloud messaging dependency
+
+    testImplementation 'junit:junit:4.13.2'
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                groupId = project.group
+                artifactId = 'android-sdk'
+                version = project.version
+
+                pom {
+                    name = 'AlgorithmX Android SDK'
+                    description = 'AlgorithmX SDK for Android: customer identity and events, push notifications, campaign actions, and in-app campaigns.'
+                    url = 'https://github.com/algorithmx-cloud/algorithmx-android-sdk'
+                    licenses {
+                        license {
+                            name = 'MIT License'
+                            url = 'https://opensource.org/licenses/MIT'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'algorithmx'
+                            name = 'AlgorithmX'
+                            email = 'hello@algorithmx.com'
+                            organization = 'AlgorithmX'
+                            organizationUrl = 'https://algorithmx.com'
+                        }
+                    }
+                    scm {
+                        url = 'https://github.com/algorithmx-cloud/algorithmx-android-sdk'
+                        connection = 'scm:git:https://github.com/algorithmx-cloud/algorithmx-android-sdk.git'
+                        developerConnection = 'scm:git:ssh://git@github.com/algorithmx-cloud/algorithmx-android-sdk.git'
+                    }
+                }
+            }
+        }
+        repositories {
+            // Local folder that the release workflow zips and uploads to the
+            // Maven Central Portal. Nothing is uploaded by Gradle itself.
+            maven {
+                name = 'staging'
+                url = layout.buildDirectory.dir('staging-deploy')
+            }
+        }
+    }
+
+    // Signs only when a key is provided (the release workflow passes it through
+    // ORG_GRADLE_PROJECT_signingInMemoryKey); local builds stay unsigned.
+    def signingKey = findProperty('signingInMemoryKey')
+    if (signingKey) {
+        signing {
+            useInMemoryPgpKeys(signingKey, findProperty('signingInMemoryKeyPassword') ?: '')
+            sign publishing.publications.release
+        }
+    }
+}

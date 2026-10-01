@@ -1,0 +1,23 @@
+// Standalone build of the AlgorithmX Android SDK, used by its own repository and
+// release workflow. When a demo app includes this folder as the ':android-sdk'
+// module, Gradle uses the demo's settings and ignores this file.
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    plugins {
+        id 'com.android.library' version '8.5.2'
+        id 'org.jetbrains.kotlin.android' version '1.9.25'
+    }
+}
+
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.name = 'android-sdk'
