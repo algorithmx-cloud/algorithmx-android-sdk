@@ -5,8 +5,8 @@ plugins {
     id 'signing'
 }
 
-// Maven Central coordinates: com.algorithmx:android-sdk:<version>
-group = 'com.algorithmx'
+// Maven Central coordinates: cloud.algorithmx:android-sdk:<version>
+group = 'cloud.algorithmx'
 version = '1.0.0'
 
 android {
@@ -85,9 +85,9 @@ afterEvaluate {
                         developer {
                             id = 'algorithmx'
                             name = 'AlgorithmX'
-                            email = 'hello@algorithmx.com'
+                            email = 'hello@algorithmx.cloud'
                             organization = 'AlgorithmX'
-                            organizationUrl = 'https://algorithmx.com'
+                            organizationUrl = 'https://algorithmx.cloud'
                         }
                     }
                     scm {
