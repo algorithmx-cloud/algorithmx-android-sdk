@@ -12,7 +12,7 @@ package algorithmx.engage.interfaces
  * class MyApplication : Application(), ActionButtonHandler {
  *     override fun onCreate() {
  *         super.onCreate()
- *         AlgorithmX.initialize(this, "https://api.example.com")
+ *         AlgorithmX.initialize(this, "https://api.example.com", "your-partner-id")
  *         AlgorithmX.setActionButtonHandler(this)
  *     }
  *     

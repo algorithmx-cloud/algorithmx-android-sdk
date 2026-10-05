@@ -11,7 +11,7 @@ The SDK is on Maven Central. Add it to your app module:
 
 ```kotlin
 dependencies {
-    implementation("cloud.algorithmx:android-sdk:1.0.0")
+    implementation("cloud.algorithmx:android-sdk:1.0.1")
 }
 ```
 
@@ -25,10 +25,12 @@ import algorithmx.engage.core.AlgorithmX
 class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        AlgorithmX.initialize(this, "https://api.example.com")
+        AlgorithmX.initialize(this, "https://api.example.com", "your-partner-id")
     }
 }
 ```
+
+AlgorithmX gives you the API base URL and your partner ID. The SDK sends the partner ID in the `x-partner-id` header of every request.
 
 The integration guide covers the full setup: customer identity, events, your existing Firebase messaging service, deep links, custom actions, and notification buttons.
 

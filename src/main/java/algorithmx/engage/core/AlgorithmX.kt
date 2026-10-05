@@ -18,6 +18,7 @@ import algorithmx.engage.interfaces.DeepLinkHandler
 import algorithmx.engage.interfaces.ActionButtonHandler
 import algorithmx.engage.interfaces.CampaignInteractionListener
 import algorithmx.engage.events.EventDispatcher
+import algorithmx.engage.networking.NetworkClient
 import algorithmx.engage.webview.WebViewQueueManager
 import algorithmx.engage.webview.WebViewDisplayRule
 import algorithmx.engage.notifications.EngageNotificationManager
@@ -70,10 +71,14 @@ object AlgorithmX {
 
     // region ─ Initialization ──────────────────────────────────────────────────
 
-    /** Safe to call more than once: later calls only update the base URL. */
-    fun initialize(application: Application, apiBaseUrl: String) {
+    /**
+     * Safe to call more than once: later calls only update the base URL and partner ID.
+     * [partnerId] is sent as the `x-partner-id` header on every request.
+     */
+    fun initialize(application: Application, apiBaseUrl: String, partnerId: String) {
         appContext = application.applicationContext
         apiUrl = apiBaseUrl.trimEnd('/')
+        NetworkClient.partnerId = partnerId
         if (initialized) return
         initialized = true
 
@@ -88,7 +93,7 @@ object AlgorithmX {
         // process); otherwise default to the Android ID like iOS uses IDFV.
         fingerprintDevice = loadIdentifiedUserId() ?: fingerprintDevice ?: readAndroidId()
 
-        SdkLog.d(TAG, "AlgorithmX initialized with apiBaseUrl=$apiUrl")
+        SdkLog.d(TAG, "AlgorithmX initialized with apiBaseUrl=$apiUrl partnerId=$partnerId")
     }
 
     fun destroy() {
