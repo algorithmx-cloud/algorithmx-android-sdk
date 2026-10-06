@@ -35,7 +35,7 @@ jobs:
         env:
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
-        run: ./gradlew publishReleasePublicationToStagingRepository
+        run: ./gradlew testReleaseUnitTest publishReleasePublicationToStagingRepository
 
       - name: Create the Central bundle
         run: |
