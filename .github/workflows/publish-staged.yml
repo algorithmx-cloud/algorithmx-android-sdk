@@ -1,0 +1,41 @@
+# Explicitly publish a validated Maven Central deployment using the existing
+# repository publishing credentials. Tag uploads remain user-managed.
+name: Publish staged deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      deployment_id:
+        description: Maven Central deployment ID returned by the release upload
+        required: true
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate and publish the staged deployment
+        env:
+          CENTRAL_TOKEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
+          CENTRAL_TOKEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
+          DEPLOYMENT_ID: ${{ inputs.deployment_id }}
+        run: |
+          [[ "$DEPLOYMENT_ID" =~ ^[0-9a-fA-F-]{36}$ ]] || exit 1
+          token=$(printf '%s:%s' "$CENTRAL_TOKEN_USERNAME" "$CENTRAL_TOKEN_PASSWORD" | base64 -w0)
+          for attempt in $(seq 1 60); do
+            status=$(curl --fail-with-body -sS -X POST -H "Authorization: Bearer ${token}" \
+              "https://central.sonatype.com/api/v1/publisher/status?id=${DEPLOYMENT_ID}")
+            state=$(jq -r '.deploymentState' <<< "$status")
+            echo "Deployment state: $state"
+            case "$state" in
+              VALIDATED)
+                curl --fail-with-body -sS -X POST -H "Authorization: Bearer ${token}" \
+                  "https://central.sonatype.com/api/v1/publisher/deployment/${DEPLOYMENT_ID}"
+                ;;
+              PUBLISHED) exit 0 ;;
+              FAILED) echo "$status"; exit 1 ;;
+            esac
+            sleep 10
+          done
+          echo "Timed out waiting for Maven Central publication."
+          exit 1
